@@ -2,17 +2,38 @@ function init3DMotionAnimation() {
     if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) return; // no hover on touch devices
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; // user prefers reduced motion
 
-    // Select only containers with data-three-d="true"
-    const wrappers = document.querySelectorAll('.card-3d-wrapper[data-three-d="true"]');
-    if (!wrappers.length) return;
+    // Select only containers with data-three-d
+    const cards = document.querySelectorAll('.card-3d');
 
-    wrappers.forEach(wrapper => {
-        const card = wrapper.querySelector('.card-3d');
-        if (!card) return; // ensure card exists
+    if (!cards.length) return;
+
+    cards.forEach(card => {
+        // Apply 3D transform to the card
+        card.style.transformStyle = 'preserve-3d';
+
+        // Create a wrapper element
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('card-3d-wrapper');
+        wrapper.style.width = 'max-content';
+        wrapper.style.margin = '0 auto';
+
+        // Insert wrapper before the card and move the card inside it
+        card.parentNode.insertBefore(wrapper, card);
+        wrapper.appendChild(card);
+
+        // Move all data-three-d attributes from card to wrapper
+        Array.from(card.attributes).forEach(attr => {
+            if (attr.name.startsWith('data-three-d')) {
+                wrapper.setAttribute(attr.name, attr.value);
+                card.removeAttribute(attr.name); // remove from card
+            }
+        });
 
         // Read data-attributes with fallbacks
-        const perspective = wrapper.getAttribute('data-perspective') || '1000';
-        const maxRotate = parseFloat(wrapper.getAttribute('data-rotate-max')) || 2;
+        const perspective = wrapper.dataset.threeDPerspective || '1000';
+        const maxRotate = wrapper.dataset.threeDMaxRotate || 2;
+
+        /* ========================= Old Code ========================= */
 
         wrapper.style.perspective = `${perspective}px`;
 
@@ -103,3 +124,7 @@ function init3DMotionAnimation() {
         }
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    init3DMotionAnimation();
+});
