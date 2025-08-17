@@ -16,7 +16,12 @@ add_action('enqueue_block_editor_assets', function() {
     wp_enqueue_script(
         'three-d-hover-effect-editor',
         plugin_dir_url( __FILE__ ) . 'editor/index.js',
-        [],
+        [
+            'wp-element',
+            'wp-components',
+            'wp-block-editor',
+            'wp-hooks'
+        ],
         filemtime( plugin_dir_path( __FILE__ ) . 'editor/index.js' )
     );
 });
